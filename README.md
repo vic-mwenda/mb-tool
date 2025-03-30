@@ -117,16 +117,4 @@ mb-tool write --type coil --address 0 --values true,false,true
 
 ## License
 
-MIT
-```
-
-Finally, let's make the CLI script executable:
-
-```bash
-chmod +x bin/mb-tool.js
-```
-
-Now, let's install the tool locally for testing:
-
-```bash
-npm link
+MIT License
