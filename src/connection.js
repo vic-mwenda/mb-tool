@@ -46,6 +46,7 @@ async function setupRTUConnection(options) {
 }
 
 async function setupTCPConnection(options) {
+  // console.log(options);
   if (!options.host || !options.port) {
     options = await promptTCPConnectionDetails(options);
   }

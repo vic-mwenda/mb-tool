@@ -16,12 +16,13 @@ connectCmd
   .command('rtu')
   .description('Connect to a Modbus RTU device')
   .option('-p, --port <port>', 'Serial port path (e.g., /dev/ttyUSB0, COM1)')
-  .option('-b, --baudRate <rate>', 'Baud rate', parseInt, 9600)
-  .option('-d, --dataBits <bits>', 'Data bits', parseInt, 8)
-  .option('-s, --stopBits <bits>', 'Stop bits', parseInt, 1)
+  .option('-b, --baudRate <rate>', 'Baud rate', (val) => parseInt(val, 10), 9600)
+  .option('-d, --dataBits <bits>', 'Data bits', (val) => parseInt(val, 10), 8)
+  .option('-s, --stopBits <bits>', 'Stop bits', (val) => parseInt(val, 10), 1)
   .option('-a, --parity <parity>', 'Parity (none, even, odd)', 'none')
-  .option('-i, --id <id>', 'Slave ID', parseInt, 1)
+  .option('-i, --id <id>', 'Slave ID', (val) => parseInt(val, 10), 1)
   .action((options) => {
+    console.log('RTU Options:', options);
     setupConnection({ ...options, type: 'rtu' });
   });
 
@@ -29,13 +30,18 @@ connectCmd
   .command('tcp')
   .description('Connect to a Modbus TCP device')
   .option('-h, --host <host>', 'Host IP address or hostname', 'localhost')
-  .option('-p, --port <port>', 'TCP port', parseInt, 502)
-  .option('-i, --id <id>', 'Slave ID', parseInt, 1)
+  .option('-p, --port <port>', 'TCP port', (val) => parseInt(val, 10), 502)
+  .option('-i, --id <id>', 'Slave ID', (val) => parseInt(val, 10), 1)
   .action((options) => {
+    console.log('TCP Options:', options);
+    
+    if (typeof options.port === 'string') options.port = parseInt(options.port, 10);
+    if (typeof options.id === 'string') options.id = parseInt(options.id, 10);
+        
     setupConnection({ ...options, type: 'tcp' });
   });
 
-connectCmd
+  connectCmd
   .action(() => {
     setupConnection({});
   });
@@ -44,17 +50,28 @@ program
   .command('read')
   .description('Read Modbus registers')
   .option('-t, --type <type>', 'Register type (holding, input, coil, discrete)', 'holding')
-  .option('-a, --address <address>', 'Starting address', parseInt, 0)
-  .option('-c, --count <count>', 'Number of registers to read', parseInt, 1)
-  .action(readRegisters);
+  .option('-a, --address <address>', 'Starting address', (val) => parseInt(val, 10), 0)
+  .option('-c, --count <count>', 'Number of registers to read', (val) => parseInt(val, 10), 1)
+  .action((options) => {
+    console.log('Read Options:', options);
+    if (typeof options.address === 'string') options.address = parseInt(options.address, 10);
+    if (typeof options.count === 'string') options.count = parseInt(options.count, 10);
+    
+    readRegisters(options);
+  });
 
 program
   .command('write')
   .description('Write to Modbus registers')
   .option('-t, --type <type>', 'Register type (holding, coil)', 'holding')
-  .option('-a, --address <address>', 'Starting address', parseInt, 0)
+  .option('-a, --address <address>', 'Starting address', (val) => parseInt(val, 10), 0)
   .option('-v, --values <values>', 'Values to write (comma-separated)')
-  .action(writeRegisters);
+  .action((options) => {
+    console.log('Write Options:', options);
+    if (typeof options.address === 'string') options.address = parseInt(options.address, 10);
+    
+    writeRegisters(options);
+  });
 
 program.parse(process.argv);
 
